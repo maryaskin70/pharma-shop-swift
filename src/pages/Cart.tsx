@@ -5,12 +5,23 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Input } from "@/components/ui/input";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { Minus, Plus, X, ShoppingCart } from "lucide-react";
+import { Minus, Plus, X, ShoppingCart, Tag, Trash2 } from "lucide-react";
+import { useState } from "react";
 
 // WordPress/WooCommerce Cart page pattern
-// Cart data managed via React context, ready for WordPress integration
+// Cart data: GET /wp-json/wc/store/cart
+// Update item: POST /wp-json/wc/store/cart/update-item
+// Remove item: POST /wp-json/wc/store/cart/remove-item
+// Apply coupon: POST /wp-json/wc/store/cart/apply-coupon
+// Calculate shipping: POST /wp-json/wc/store/cart/select-shipping-rate
 const Cart = () => {
   const { items, updateQuantity, removeFromCart, getCartTotal, clearCart } = useCart();
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  
+  // These values will come from WooCommerce
+  const shipping: number = 0; // From WooCommerce shipping zones and methods
+  const tax: number = getCartTotal() * 0.1; // From WooCommerce tax settings
 
   if (items.length === 0) {
     return (
@@ -136,17 +147,62 @@ const Cart = () => {
               </CardContent>
             </Card>
 
+            {/* Coupon Code Section - WooCommerce pattern */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex gap-2">
+                  <div className="flex-1 flex gap-2">
+                    <Tag className="h-5 w-5 text-muted-foreground mt-2.5" />
+                    <Input
+                      placeholder="Coupon code"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                  <Button 
+                    variant="secondary"
+                    onClick={() => {
+                      // TODO: Apply coupon via WooCommerce API
+                      if (couponCode) {
+                        setAppliedCoupon(couponCode);
+                        setCouponCode("");
+                      }
+                    }}
+                  >
+                    Apply Coupon
+                  </Button>
+                </div>
+                {appliedCoupon && (
+                  <div className="mt-3 flex items-center justify-between text-sm">
+                    <span className="text-accent">Coupon "{appliedCoupon}" applied!</span>
+                    <button 
+                      onClick={() => setAppliedCoupon(null)}
+                      className="text-destructive hover:underline"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
             <div className="flex justify-between items-center">
               <Link to="/shop">
                 <Button variant="outline">Continue Shopping</Button>
               </Link>
-              <Button variant="destructive" onClick={clearCart}>
-                Clear Cart
+              <Button 
+                variant="ghost" 
+                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                onClick={clearCart}
+              >
+                <Trash2 className="h-4 w-4 mr-2" />
+                Update Cart
               </Button>
             </div>
           </div>
 
-          {/* Cart Totals - WordPress/WooCommerce pattern */}
+          {/* Cart Totals - WooCommerce pattern */}
           <div className="lg:col-span-1">
             <Card className="sticky top-6">
               <CardContent className="p-6 space-y-4">
@@ -154,21 +210,55 @@ const Cart = () => {
                 <Separator />
                 
                 <div className="space-y-3">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Subtotal</span>
+                  <div className="flex justify-between text-base">
+                    <span>Subtotal</span>
                     <span className="font-semibold">${getCartTotal().toFixed(2)}</span>
                   </div>
                   
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Shipping</span>
-                    <span className="font-semibold">Free</span>
+                  {appliedCoupon && (
+                    <>
+                      <div className="flex justify-between text-sm text-accent">
+                        <span>Coupon: {appliedCoupon}</span>
+                        <span className="font-semibold">-$10.00</span>
+                      </div>
+                    </>
+                  )}
+                  
+                  <Separator />
+                  
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-base">
+                      <span>Shipping</span>
+                      <div className="text-right">
+                        {shipping === 0 ? (
+                          <span className="text-accent font-medium">Free shipping</span>
+                        ) : (
+                          <span className="font-semibold">${shipping.toFixed(2)}</span>
+                        )}
+                      </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground text-right">
+                      Shipping to <span className="font-medium">United States</span>.
+                    </p>
+                    <button className="text-xs text-primary hover:underline block ml-auto">
+                      Change address
+                    </button>
+                  </div>
+                  
+                  <Separator />
+                  
+                  <div className="flex justify-between text-base">
+                    <span>Tax</span>
+                    <span className="font-semibold">${tax.toFixed(2)}</span>
                   </div>
                   
                   <Separator />
                   
                   <div className="flex justify-between text-lg">
                     <span className="font-bold">Total</span>
-                    <span className="font-bold text-primary">${getCartTotal().toFixed(2)}</span>
+                    <span className="font-bold text-primary">
+                      ${(getCartTotal() + shipping + tax - (appliedCoupon ? 10 : 0)).toFixed(2)}
+                    </span>
                   </div>
                 </div>
 

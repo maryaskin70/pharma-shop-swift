@@ -9,8 +9,11 @@ import { Separator } from "@/components/ui/separator";
 import { Badge } from "@/components/ui/badge";
 import { Package, MapPin, User, LogOut } from "lucide-react";
 
-// WordPress/WooCommerce My Account page pattern
-// User data and orders will be fetched from WordPress/WooCommerce REST API
+// WordPress/WooCommerce My Account page pattern  
+// Customer data: GET /wp-json/wc/v3/customers/{id}
+// Orders: GET /wp-json/wc/v3/orders?customer={id}
+// Update customer: PUT /wp-json/wc/v3/customers/{id}
+// Addresses: Billing and shipping stored in customer meta
 const Account = () => {
   // TODO: Replace with actual user data from WordPress
   const [userData, setUserData] = useState({
@@ -87,139 +90,182 @@ const Account = () => {
             </TabsTrigger>
           </TabsList>
 
-          {/* Orders Tab */}
+          {/* Orders Tab - WooCommerce pattern */}
           <TabsContent value="orders" className="space-y-4">
             <Card>
-              <CardHeader>
-                <CardTitle>Recent Orders</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {orders.map((order) => (
-                    <div key={order.id}>
-                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-semibold">Order #{order.id}</span>
-                            <Badge className={getStatusColor(order.status)}>
-                              {order.status}
+              <CardContent className="p-6">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="border-b">
+                      <tr className="text-left text-sm">
+                        <th className="pb-3 font-semibold">Order</th>
+                        <th className="pb-3 font-semibold">Date</th>
+                        <th className="pb-3 font-semibold">Status</th>
+                        <th className="pb-3 font-semibold">Total</th>
+                        <th className="pb-3 font-semibold text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {orders.map((order) => (
+                        <tr key={order.id} className="text-sm">
+                          <td className="py-4">
+                            <span className="font-medium">#{order.id}</span>
+                          </td>
+                          <td className="py-4 text-muted-foreground">
+                            {new Date(order.date).toLocaleDateString('en-US', { 
+                              year: 'numeric', 
+                              month: 'long', 
+                              day: 'numeric' 
+                            })}
+                          </td>
+                          <td className="py-4">
+                            <Badge className={getStatusColor(order.status)} variant="secondary">
+                              {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                             </Badge>
-                          </div>
-                          <p className="text-sm text-muted-foreground">
-                            Placed on {new Date(order.date).toLocaleDateString()} • {order.items} items
-                          </p>
-                        </div>
-                        <div className="flex items-center gap-4">
-                          <span className="font-bold text-primary">${order.total.toFixed(2)}</span>
-                          <Button variant="outline" size="sm">View Details</Button>
-                        </div>
-                      </div>
-                      <Separator className="mt-4" />
-                    </div>
-                  ))}
+                          </td>
+                          <td className="py-4">
+                            <span className="font-semibold">${order.total.toFixed(2)}</span>
+                            <span className="text-muted-foreground"> for {order.items} item{order.items > 1 ? 's' : ''}</span>
+                          </td>
+                          <td className="py-4 text-right">
+                            <Button variant="outline" size="sm">View</Button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
 
-          {/* Addresses Tab */}
+          {/* Addresses Tab - WooCommerce pattern */}
           <TabsContent value="addresses">
+            <p className="text-sm text-muted-foreground mb-6">
+              The following addresses will be used on the checkout page by default.
+            </p>
             <div className="grid md:grid-cols-2 gap-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Billing Address</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <p className="font-semibold">{userData.firstName} {userData.lastName}</p>
-                  <p className="text-sm text-muted-foreground">123 Pharmacy Street</p>
-                  <p className="text-sm text-muted-foreground">Medical District</p>
-                  <p className="text-sm text-muted-foreground">New York, NY 10001</p>
-                  <Button variant="outline" className="mt-4">Edit Address</Button>
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-semibold">Billing Address</h3>
+                    <Button variant="outline" size="sm">Edit</Button>
+                  </div>
+                  <div className="space-y-1 text-sm">
+                    <p className="font-medium">{userData.firstName} {userData.lastName}</p>
+                    <p className="text-muted-foreground">123 Pharmacy Street</p>
+                    <p className="text-muted-foreground">Medical District</p>
+                    <p className="text-muted-foreground">New York, NY 10001</p>
+                    <p className="text-muted-foreground">United States</p>
+                    <p className="text-muted-foreground mt-2">{userData.phone}</p>
+                    <p className="text-muted-foreground">{userData.email}</p>
+                  </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>Shipping Address</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-2">
-                  <p className="font-semibold">{userData.firstName} {userData.lastName}</p>
-                  <p className="text-sm text-muted-foreground">123 Pharmacy Street</p>
-                  <p className="text-sm text-muted-foreground">Medical District</p>
-                  <p className="text-sm text-muted-foreground">New York, NY 10001</p>
-                  <Button variant="outline" className="mt-4">Edit Address</Button>
+                <CardContent className="p-6">
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-semibold">Shipping Address</h3>
+                    <Button variant="outline" size="sm">Edit</Button>
+                  </div>
+                  <div className="space-y-1 text-sm">
+                    <p className="font-medium">{userData.firstName} {userData.lastName}</p>
+                    <p className="text-muted-foreground">123 Pharmacy Street</p>
+                    <p className="text-muted-foreground">Medical District</p>
+                    <p className="text-muted-foreground">New York, NY 10001</p>
+                    <p className="text-muted-foreground">United States</p>
+                  </div>
                 </CardContent>
               </Card>
             </div>
           </TabsContent>
 
-          {/* Account Details Tab */}
+          {/* Account Details Tab - WooCommerce pattern */}
           <TabsContent value="details">
             <Card>
-              <CardHeader>
-                <CardTitle>Account Details</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <form className="space-y-4">
+              <CardContent className="p-6">
+                <form className="space-y-6">
                   <div className="grid md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
+                      <Label htmlFor="firstName">
+                        First Name <span className="text-destructive">*</span>
+                      </Label>
                       <Input
                         id="firstName"
                         value={userData.firstName}
                         onChange={(e) => setUserData({ ...userData, firstName: e.target.value })}
+                        required
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
+                      <Label htmlFor="lastName">
+                        Last Name <span className="text-destructive">*</span>
+                      </Label>
                       <Input
                         id="lastName"
                         value={userData.lastName}
                         onChange={(e) => setUserData({ ...userData, lastName: e.target.value })}
+                        required
                       />
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="email">Email Address</Label>
+                    <Label htmlFor="displayName">
+                      Display Name <span className="text-destructive">*</span>
+                    </Label>
+                    <Input
+                      id="displayName"
+                      value={`${userData.firstName} ${userData.lastName}`}
+                      placeholder="This will be how your name will be displayed"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      This will be how your name will be displayed in the account section and in reviews
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">
+                      Email Address <span className="text-destructive">*</span>
+                    </Label>
                     <Input
                       id="email"
                       type="email"
                       value={userData.email}
                       onChange={(e) => setUserData({ ...userData, email: e.target.value })}
+                      required
                     />
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      value={userData.phone}
-                      onChange={(e) => setUserData({ ...userData, phone: e.target.value })}
-                    />
+                  <Separator />
+
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Password Change</h3>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="currentPassword">
+                        Current Password (leave blank to leave unchanged)
+                      </Label>
+                      <Input id="currentPassword" type="password" autoComplete="current-password" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="newPassword">
+                        New Password (leave blank to leave unchanged)
+                      </Label>
+                      <Input id="newPassword" type="password" autoComplete="new-password" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <Input id="confirmPassword" type="password" autoComplete="new-password" />
+                    </div>
                   </div>
 
-                  <Separator className="my-6" />
-
-                  <h3 className="text-lg font-semibold">Password Change</h3>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="currentPassword">Current Password</Label>
-                    <Input id="currentPassword" type="password" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="newPassword">New Password</Label>
-                    <Input id="newPassword" type="password" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="confirmPassword">Confirm New Password</Label>
-                    <Input id="confirmPassword" type="password" />
-                  </div>
-
-                  <Button type="submit" className="mt-6">Save Changes</Button>
+                  <Button type="submit" size="lg">
+                    Save Changes
+                  </Button>
                 </form>
               </CardContent>
             </Card>
