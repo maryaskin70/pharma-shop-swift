@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { Star, ShieldCheck, Truck, Minus, Plus } from "lucide-react";
+import { Star, ShieldCheck, Truck, Minus, Plus, Share2, Tag, Package } from "lucide-react";
 import { useState } from "react";
 
 // WordPress/WooCommerce Product Detail page pattern
@@ -17,6 +17,7 @@ const ProductDetail = () => {
   const { id } = useParams();
   const product = products.find((p) => p.id === id);
   const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(0);
   const { addToCart } = useCart();
 
   const handleAddToCart = () => {
@@ -62,15 +63,45 @@ const ProductDetail = () => {
 
         {/* Product Detail */}
         <div className="grid lg:grid-cols-2 gap-8 mb-12">
-          {/* Product Image */}
+          {/* Product Gallery - WooCommerce pattern */}
           <div className="space-y-4">
-            <div className="aspect-square bg-muted rounded-lg overflow-hidden">
+            {/* Main Image */}
+            <div className="aspect-square bg-muted rounded-lg overflow-hidden relative group">
               <img
-                src={product.image}
+                src={product.gallery?.[selectedImage] || product.image}
                 alt={product.name}
                 className="w-full h-full object-cover"
               />
+              {/* Zoom indicator - WordPress/WooCommerce feature placeholder */}
+              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors flex items-center justify-center opacity-0 group-hover:opacity-100">
+                <span className="text-xs text-muted-foreground bg-background/80 px-2 py-1 rounded">
+                  Click to zoom
+                </span>
+              </div>
             </div>
+            
+            {/* Thumbnail Gallery */}
+            {product.gallery && product.gallery.length > 1 && (
+              <div className="grid grid-cols-4 gap-2">
+                {product.gallery.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImage(index)}
+                    className={`aspect-square bg-muted rounded-md overflow-hidden border-2 transition-colors ${
+                      selectedImage === index
+                        ? "border-primary"
+                        : "border-transparent hover:border-muted-foreground/50"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`${product.name} - Image ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -78,6 +109,8 @@ const ProductDetail = () => {
             <div>
               <Badge className="mb-2">{product.category}</Badge>
               <h1 className="text-3xl lg:text-4xl font-bold mb-2">{product.name}</h1>
+              
+              {/* Rating and Reviews */}
               <div className="flex items-center gap-2 mb-4">
                 <div className="flex items-center gap-1">
                   {[...Array(5)].map((_, i) => (
@@ -92,46 +125,84 @@ const ProductDetail = () => {
                   ))}
                 </div>
                 <span className="text-sm">
-                  {product.rating} ({product.reviews} reviews)
+                  {product.rating} ({product.reviews} customer reviews)
                 </span>
               </div>
             </div>
 
             <Separator />
 
+            {/* Price and Stock */}
             <div>
               <p className="text-4xl font-bold text-primary mb-2">
                 ${product.price.toFixed(2)}
               </p>
-              {product.inStock ? (
-                <Badge variant="secondary" className="bg-accent text-accent-foreground">
-                  In Stock
-                </Badge>
-              ) : (
-                <Badge variant="destructive">Out of Stock</Badge>
-              )}
+              <div className="flex items-center gap-2">
+                {product.inStock ? (
+                  <>
+                    <Badge variant="secondary" className="bg-accent text-accent-foreground">
+                      In Stock
+                    </Badge>
+                    {product.stockQuantity && (
+                      <span className="text-sm text-muted-foreground">
+                        {product.stockQuantity} units available
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <Badge variant="destructive">Out of Stock</Badge>
+                )}
+              </div>
             </div>
+
+            {/* Short Description - WooCommerce pattern */}
+            {product.shortDescription && (
+              <div className="text-muted-foreground leading-relaxed">
+                {product.shortDescription}
+              </div>
+            )}
 
             <Separator />
 
-            <div className="space-y-3">
-              <h3 className="font-semibold text-lg">Product Details</h3>
-              <p className="text-muted-foreground">{product.description}</p>
-              <div className="space-y-2">
+            {/* Product Meta - WooCommerce pattern */}
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center gap-2">
+                <Package className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">SKU:</span>
+                <span className="text-muted-foreground">{product.sku}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <Tag className="h-4 w-4 text-muted-foreground" />
+                <span className="font-medium">Category:</span>
+                <Link to="/shop" className="text-primary hover:underline">
+                  {product.category}
+                </Link>
+              </div>
+              {product.tags && product.tags.length > 0 && (
                 <div className="flex items-start gap-2">
-                  <span className="font-medium min-w-[140px]">Brand:</span>
-                  <span className="text-muted-foreground">{product.brand}</span>
+                  <Tag className="h-4 w-4 text-muted-foreground mt-0.5" />
+                  <span className="font-medium">Tags:</span>
+                  <div className="flex flex-wrap gap-1">
+                    {product.tags.map((tag, index) => (
+                      <span key={index}>
+                        <Link to="/shop" className="text-primary hover:underline">
+                          {tag}
+                        </Link>
+                        {index < product.tags!.length - 1 && ", "}
+                      </span>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex items-start gap-2">
-                  <span className="font-medium min-w-[140px]">Active Ingredient:</span>
-                  <span className="text-muted-foreground">{product.activeIngredient}</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="font-medium min-w-[140px]">Dosage:</span>
-                  <span className="text-muted-foreground">{product.dosage}</span>
-                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <button className="flex items-center gap-1 text-primary hover:underline">
+                  <Share2 className="h-4 w-4" />
+                  <span>Share this product</span>
+                </button>
               </div>
             </div>
+
+            <Separator />
 
             <Separator />
 
@@ -232,6 +303,10 @@ const ProductDetail = () => {
               <CardContent className="p-6">
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-4 py-3 border-b">
+                    <span className="font-medium">SKU</span>
+                    <span className="text-muted-foreground">{product.sku}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 py-3 border-b">
                     <span className="font-medium">Brand</span>
                     <span className="text-muted-foreground">{product.brand}</span>
                   </div>
@@ -243,10 +318,28 @@ const ProductDetail = () => {
                     <span className="font-medium">Dosage</span>
                     <span className="text-muted-foreground">{product.dosage}</span>
                   </div>
-                  <div className="grid grid-cols-2 gap-4 py-3">
+                  {product.weight && (
+                    <div className="grid grid-cols-2 gap-4 py-3 border-b">
+                      <span className="font-medium">Weight</span>
+                      <span className="text-muted-foreground">{product.weight}</span>
+                    </div>
+                  )}
+                  {product.dimensions && (
+                    <div className="grid grid-cols-2 gap-4 py-3 border-b">
+                      <span className="font-medium">Dimensions</span>
+                      <span className="text-muted-foreground">{product.dimensions}</span>
+                    </div>
+                  )}
+                  <div className="grid grid-cols-2 gap-4 py-3 border-b">
                     <span className="font-medium">Category</span>
                     <span className="text-muted-foreground">{product.category}</span>
                   </div>
+                  {product.tags && product.tags.length > 0 && (
+                    <div className="grid grid-cols-2 gap-4 py-3">
+                      <span className="font-medium">Tags</span>
+                      <span className="text-muted-foreground">{product.tags.join(", ")}</span>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
