@@ -73,12 +73,12 @@ const Checkout = () => {
       <div className="container mx-auto px-4 py-6">
         <Breadcrumbs items={[{ label: "Cart", href: "/cart" }, { label: "Checkout" }]} />
         
-        <h1 className="text-3xl font-bold mb-6">Checkout</h1>
+        <h1 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">Checkout</h1>
 
         <form onSubmit={handleSubmit}>
-          <div className="grid lg:grid-cols-3 gap-6">
+          <div className="grid lg:grid-cols-3 gap-4 lg:gap-6">
             {/* Billing Details */}
-            <div className="lg:col-span-2 space-y-6">
+            <div className="lg:col-span-2 space-y-4 lg:space-y-6 order-2 lg:order-1">
               <Card>
                 <CardHeader>
                   <CardTitle>Billing Details</CardTitle>
@@ -207,8 +207,8 @@ const Checkout = () => {
             </div>
 
             {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <Card className="sticky top-6">
+            <div className="lg:col-span-1 order-1 lg:order-2">
+              <Card className="lg:sticky lg:top-6">
                 <CardHeader>
                   <CardTitle>Your Order</CardTitle>
                 </CardHeader>
@@ -264,7 +264,7 @@ const Checkout = () => {
 
                   <Button 
                     type="submit" 
-                    className="w-full" 
+                    className="w-full min-h-[48px]" 
                     size="lg"
                     disabled={isProcessing}
                   >

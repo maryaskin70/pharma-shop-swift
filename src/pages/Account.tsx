@@ -74,19 +74,19 @@ const Account = () => {
           </Button>
         </div>
 
-        <Tabs defaultValue="orders" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="orders">
-              <Package className="mr-2 h-4 w-4" />
-              Orders
+        <Tabs defaultValue="orders" className="space-y-4 lg:space-y-6">
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="orders" className="py-3 text-xs sm:text-sm">
+              <Package className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Orders</span>
             </TabsTrigger>
-            <TabsTrigger value="addresses">
-              <MapPin className="mr-2 h-4 w-4" />
-              Addresses
+            <TabsTrigger value="addresses" className="py-3 text-xs sm:text-sm">
+              <MapPin className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Addresses</span>
             </TabsTrigger>
-            <TabsTrigger value="details">
-              <User className="mr-2 h-4 w-4" />
-              Account Details
+            <TabsTrigger value="details" className="py-3 text-xs sm:text-sm">
+              <User className="mr-0 sm:mr-2 h-4 w-4" />
+              <span className="hidden sm:inline">Account Details</span>
             </TabsTrigger>
           </TabsList>
 
@@ -263,7 +263,7 @@ const Account = () => {
                     </div>
                   </div>
 
-                  <Button type="submit" size="lg">
+                  <Button type="submit" size="lg" className="min-h-[48px]">
                     Save Changes
                   </Button>
                 </form>

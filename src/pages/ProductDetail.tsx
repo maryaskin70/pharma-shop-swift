@@ -62,9 +62,9 @@ const ProductDetail = () => {
         />
 
         {/* Product Detail */}
-        <div className="grid lg:grid-cols-2 gap-8 mb-12">
+        <div className="grid lg:grid-cols-2 gap-4 lg:gap-8 mb-8 lg:mb-12">
           {/* Product Gallery - WooCommerce pattern */}
-          <div className="space-y-4">
+          <div className="space-y-2 lg:space-y-4">
             {/* Main Image */}
             <div className="aspect-square bg-muted rounded-lg overflow-hidden relative group">
               <img
@@ -82,7 +82,7 @@ const ProductDetail = () => {
             
             {/* Thumbnail Gallery */}
             {product.gallery && product.gallery.length > 1 && (
-              <div className="grid grid-cols-4 gap-2">
+              <div className="grid grid-cols-4 lg:grid-cols-4 gap-2 lg:gap-2">
                 {product.gallery.map((img, index) => (
                   <button
                     key={index}
@@ -105,7 +105,7 @@ const ProductDetail = () => {
           </div>
 
           {/* Product Info */}
-          <div className="space-y-6">
+          <div className="space-y-4 lg:space-y-6">
             <div>
               <Badge className="mb-2">{product.category}</Badge>
               <h1 className="text-3xl lg:text-4xl font-bold mb-2">{product.name}</h1>
@@ -230,10 +230,10 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Action Buttons */}
-            <div className="space-y-3">
+            {/* Action Buttons - Sticky on mobile */}
+            <div className="space-y-3 lg:space-y-3">
               <Button 
-                className="w-full" 
+                className="w-full min-h-[48px]" 
                 size="lg" 
                 disabled={!product.inStock}
                 onClick={handleAddToCart}
@@ -243,7 +243,7 @@ const ProductDetail = () => {
               <Link to="/checkout">
                 <Button 
                   variant="secondary" 
-                  className="w-full" 
+                  className="w-full min-h-[48px]" 
                   size="lg" 
                   disabled={!product.inStock}
                   onClick={handleAddToCart}
@@ -272,14 +272,14 @@ const ProductDetail = () => {
         </div>
 
         {/* Product Tabs - WordPress/WooCommerce pattern */}
-        <Tabs defaultValue="description" className="mb-12">
-          <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="description">Description</TabsTrigger>
-            <TabsTrigger value="additional">Additional Info</TabsTrigger>
-            <TabsTrigger value="reviews">Reviews ({product.reviews})</TabsTrigger>
+        <Tabs defaultValue="description" className="mb-8 lg:mb-12">
+          <TabsList className="grid w-full grid-cols-3 h-auto">
+            <TabsTrigger value="description" className="text-xs sm:text-sm py-3">Description</TabsTrigger>
+            <TabsTrigger value="additional" className="text-xs sm:text-sm py-3">Additional Info</TabsTrigger>
+            <TabsTrigger value="reviews" className="text-xs sm:text-sm py-3">Reviews ({product.reviews})</TabsTrigger>
           </TabsList>
           
-          <TabsContent value="description" className="mt-6">
+          <TabsContent value="description" className="mt-4 lg:mt-6">
             <Card>
               <CardContent className="p-6">
                 <p className="text-muted-foreground leading-relaxed">
@@ -298,7 +298,7 @@ const ProductDetail = () => {
             </Card>
           </TabsContent>
           
-          <TabsContent value="additional" className="mt-6">
+          <TabsContent value="additional" className="mt-4 lg:mt-6">
             <Card>
               <CardContent className="p-6">
                 <div className="space-y-3">
@@ -345,7 +345,7 @@ const ProductDetail = () => {
             </Card>
           </TabsContent>
           
-          <TabsContent value="reviews" className="mt-6">
+          <TabsContent value="reviews" className="mt-4 lg:mt-6">
             <Card>
               <CardContent className="p-6">
                 <div className="text-center py-8">

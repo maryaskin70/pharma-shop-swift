@@ -47,9 +47,9 @@ const Cart = () => {
       <div className="container mx-auto px-4 py-6">
         <Breadcrumbs items={[{ label: "Cart" }]} />
         
-        <h1 className="text-3xl font-bold mb-6">Shopping Cart</h1>
+        <h1 className="text-2xl lg:text-3xl font-bold mb-4 lg:mb-6">Shopping Cart</h1>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-4 lg:gap-6">
           {/* Cart Items */}
           <div className="lg:col-span-2 space-y-4">
             <Card>
@@ -103,32 +103,32 @@ const Cart = () => {
                         <span className="font-semibold">${item.price.toFixed(2)}</span>
                       </div>
 
-                      {/* Quantity */}
+                       {/* Quantity */}
                       <div className="lg:col-span-2 flex items-center justify-between lg:justify-center gap-3">
                         <span className="text-sm text-muted-foreground lg:hidden">Quantity:</span>
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8"
+                            className="h-10 w-10 touch-manipulation"
                             onClick={() => updateQuantity(item.id, item.quantity - 1)}
                           >
-                            <Minus className="h-3 w-3" />
+                            <Minus className="h-4 w-4" />
                           </Button>
                           <Input
                             type="number"
                             value={item.quantity}
                             onChange={(e) => updateQuantity(item.id, parseInt(e.target.value) || 1)}
-                            className="w-16 h-8 text-center"
+                            className="w-16 h-10 text-center"
                             min="1"
                           />
                           <Button
                             variant="outline"
                             size="icon"
-                            className="h-8 w-8"
+                            className="h-10 w-10 touch-manipulation"
                             onClick={() => updateQuantity(item.id, item.quantity + 1)}
                           >
-                            <Plus className="h-3 w-3" />
+                            <Plus className="h-4 w-4" />
                           </Button>
                         </div>
                       </div>
@@ -187,13 +187,13 @@ const Cart = () => {
               </CardContent>
             </Card>
 
-            <div className="flex justify-between items-center">
-              <Link to="/shop">
-                <Button variant="outline">Continue Shopping</Button>
+            <div className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+              <Link to="/shop" className="w-full sm:w-auto">
+                <Button variant="outline" className="w-full sm:w-auto min-h-[44px]">Continue Shopping</Button>
               </Link>
               <Button 
                 variant="ghost" 
-                className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                className="text-destructive hover:text-destructive hover:bg-destructive/10 min-h-[44px]"
                 onClick={clearCart}
               >
                 <Trash2 className="h-4 w-4 mr-2" />
@@ -204,7 +204,7 @@ const Cart = () => {
 
           {/* Cart Totals - WooCommerce pattern */}
           <div className="lg:col-span-1">
-            <Card className="sticky top-6">
+            <Card className="lg:sticky lg:top-6">
               <CardContent className="p-6 space-y-4">
                 <h2 className="text-xl font-bold">Cart Totals</h2>
                 <Separator />
@@ -263,7 +263,7 @@ const Cart = () => {
                 </div>
 
                 <Link to="/checkout" className="block">
-                  <Button className="w-full" size="lg">
+                  <Button className="w-full min-h-[48px]" size="lg">
                     Proceed to Checkout
                   </Button>
                 </Link>
