@@ -1,13 +1,16 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
 import { products, categories, brands } from "@/data/products";
+import { ProductCard } from "@/components/ProductCard";
 import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
-import { Star, ShieldCheck, CreditCard, Truck, RefreshCcw, Search } from "lucide-react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { ShieldCheck, CreditCard, Truck, RefreshCcw, Search, Headphones } from "lucide-react";
+
+// WordPress/WooCommerce Shop page pattern
+// Products will be fetched from WordPress REST API: /wp-json/wc/v3/products
+// Categories and filters from WooCommerce API
 
 const Shop = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Products");
@@ -29,6 +32,10 @@ const Shop = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="container mx-auto px-4 py-6">
+        <Breadcrumbs items={[{ label: "Shop" }]} />
+      </div>
+
       {/* Why Choose Us - Desktop Only */}
       <section className="hidden lg:block bg-card border-b py-8">
         <div className="container mx-auto px-4">
@@ -39,7 +46,7 @@ const Shop = () => {
               <p className="text-xs text-muted-foreground">Sourced from original manufacturers</p>
             </div>
             <div className="flex flex-col items-center text-center">
-              <Star className="h-10 w-10 text-primary mb-3" />
+              <Headphones className="h-10 w-10 text-primary mb-3" />
               <h3 className="font-semibold text-sm mb-1">Customer Service</h3>
               <p className="text-xs text-muted-foreground">24/7 professional support</p>
             </div>
@@ -155,41 +162,17 @@ const Shop = () => {
 
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
               {filteredProducts.map((product) => (
-                <Link key={product.id} to={`/product/${product.id}`}>
-                  <Card className="h-full hover:shadow-lg transition-shadow cursor-pointer">
-                    <CardContent className="p-3">
-                      <div className="aspect-square mb-3 bg-muted rounded-md overflow-hidden">
-                        <img
-                          src={product.image}
-                          alt={product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Badge variant="secondary" className="text-xs">
-                          {product.category}
-                        </Badge>
-                        <h3 className="font-semibold text-sm line-clamp-2">{product.name}</h3>
-                        <div className="flex items-center gap-1">
-                          <Star className="h-3 w-3 fill-primary text-primary" />
-                          <span className="text-xs">{product.rating}</span>
-                          <span className="text-xs text-muted-foreground">({product.reviews})</span>
-                        </div>
-                        <div className="flex items-center justify-between">
-                          <p className="text-lg font-bold text-primary">${product.price.toFixed(2)}</p>
-                          {!product.inStock && (
-                            <Badge variant="destructive" className="text-xs">Out of Stock</Badge>
-                          )}
-                        </div>
-                        {product.inStock && (
-                          <Button className="w-full" size="sm">
-                            Add to Cart
-                          </Button>
-                        )}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </Link>
+                <ProductCard
+                  key={product.id}
+                  id={product.id}
+                  name={product.name}
+                  price={product.price}
+                  image={product.image}
+                  category={product.category}
+                  rating={product.rating}
+                  reviews={product.reviews}
+                  inStock={product.inStock}
+                />
               ))}
             </div>
           </main>

@@ -1,16 +1,36 @@
 import { useParams, Link } from "react-router-dom";
 import { products } from "@/data/products";
+import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Star, ShieldCheck, Truck, ArrowLeft, Minus, Plus } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { Star, ShieldCheck, Truck, Minus, Plus } from "lucide-react";
 import { useState } from "react";
+
+// WordPress/WooCommerce Product Detail page pattern
+// Product data will be fetched from: /wp-json/wc/v3/products/{id}
 
 const ProductDetail = () => {
   const { id } = useParams();
   const product = products.find((p) => p.id === id);
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart();
+
+  const handleAddToCart = () => {
+    if (product && product.inStock) {
+      addToCart({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        quantity,
+        image: product.image,
+        category: product.category,
+      });
+    }
+  };
 
   if (!product) {
     return (
@@ -32,13 +52,13 @@ const ProductDetail = () => {
   return (
     <div className="min-h-screen bg-background">
       <div className="container mx-auto px-4 py-6">
-        {/* Back Button */}
-        <Link to="/shop">
-          <Button variant="ghost" className="mb-6">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Shop
-          </Button>
-        </Link>
+        <Breadcrumbs 
+          items={[
+            { label: "Shop", href: "/shop" },
+            { label: product.category, href: "/shop" },
+            { label: product.name }
+          ]} 
+        />
 
         {/* Product Detail */}
         <div className="grid lg:grid-cols-2 gap-8 mb-12">
@@ -141,12 +161,25 @@ const ProductDetail = () => {
 
             {/* Action Buttons */}
             <div className="space-y-3">
-              <Button className="w-full" size="lg" disabled={!product.inStock}>
+              <Button 
+                className="w-full" 
+                size="lg" 
+                disabled={!product.inStock}
+                onClick={handleAddToCart}
+              >
                 Add to Cart
               </Button>
-              <Button variant="secondary" className="w-full" size="lg" disabled={!product.inStock}>
-                Buy Now
-              </Button>
+              <Link to="/checkout">
+                <Button 
+                  variant="secondary" 
+                  className="w-full" 
+                  size="lg" 
+                  disabled={!product.inStock}
+                  onClick={handleAddToCart}
+                >
+                  Buy Now
+                </Button>
+              </Link>
             </div>
 
             {/* Trust Badges */}
@@ -166,6 +199,72 @@ const ProductDetail = () => {
             </Card>
           </div>
         </div>
+
+        {/* Product Tabs - WordPress/WooCommerce pattern */}
+        <Tabs defaultValue="description" className="mb-12">
+          <TabsList className="grid w-full grid-cols-3">
+            <TabsTrigger value="description">Description</TabsTrigger>
+            <TabsTrigger value="additional">Additional Info</TabsTrigger>
+            <TabsTrigger value="reviews">Reviews ({product.reviews})</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="description" className="mt-6">
+            <Card>
+              <CardContent className="p-6">
+                <p className="text-muted-foreground leading-relaxed">
+                  {product.description}
+                </p>
+                <div className="mt-6 space-y-2">
+                  <h3 className="font-semibold text-lg mb-3">Key Features</h3>
+                  <ul className="list-disc list-inside space-y-2 text-muted-foreground">
+                    <li>Pharmacy grade quality from original manufacturers</li>
+                    <li>Tested and verified for purity and potency</li>
+                    <li>Discreet packaging and delivery</li>
+                    <li>30-day money-back guarantee</li>
+                  </ul>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="additional" className="mt-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-4 py-3 border-b">
+                    <span className="font-medium">Brand</span>
+                    <span className="text-muted-foreground">{product.brand}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 py-3 border-b">
+                    <span className="font-medium">Active Ingredient</span>
+                    <span className="text-muted-foreground">{product.activeIngredient}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 py-3 border-b">
+                    <span className="font-medium">Dosage</span>
+                    <span className="text-muted-foreground">{product.dosage}</span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4 py-3">
+                    <span className="font-medium">Category</span>
+                    <span className="text-muted-foreground">{product.category}</span>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+          
+          <TabsContent value="reviews" className="mt-6">
+            <Card>
+              <CardContent className="p-6">
+                <div className="text-center py-8">
+                  <Star className="h-12 w-12 mx-auto text-muted-foreground mb-3" />
+                  <h3 className="font-semibold mb-2">No reviews yet</h3>
+                  <p className="text-muted-foreground">Be the first to review this product</p>
+                  <Button variant="outline" className="mt-4">Write a Review</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
