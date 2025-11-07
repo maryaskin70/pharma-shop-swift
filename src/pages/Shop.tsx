@@ -6,18 +6,25 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
-import { Star, ShieldCheck, CreditCard, Truck, RefreshCcw } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Star, ShieldCheck, CreditCard, Truck, RefreshCcw, Search } from "lucide-react";
 
 const Shop = () => {
   const [selectedCategory, setSelectedCategory] = useState("All Products");
   const [selectedBrand, setSelectedBrand] = useState("All Brands");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 50]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredProducts = products.filter((product) => {
     const categoryMatch = selectedCategory === "All Products" || product.category === selectedCategory;
     const brandMatch = selectedBrand === "All Brands" || product.brand === selectedBrand;
     const priceMatch = product.price >= priceRange[0] && product.price <= priceRange[1];
-    return categoryMatch && brandMatch && priceMatch;
+    const searchMatch = searchQuery === "" || 
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.brand.toLowerCase().includes(searchQuery.toLowerCase());
+    return categoryMatch && brandMatch && priceMatch && searchMatch;
   });
 
   return (
@@ -127,9 +134,23 @@ const Shop = () => {
 
           {/* Products Grid */}
           <main className="flex-1">
-            <div className="mb-4 flex items-center justify-between">
-              <h1 className="text-2xl font-bold">Shop Products</h1>
-              <p className="text-sm text-muted-foreground">{filteredProducts.length} products found</p>
+            <div className="mb-4 space-y-4">
+              <div className="flex items-center justify-between">
+                <h1 className="text-2xl font-bold">Shop Products</h1>
+                <p className="text-sm text-muted-foreground">{filteredProducts.length} products found</p>
+              </div>
+              
+              {/* Search Bar */}
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  type="text"
+                  placeholder="Search products by name, category, or brand..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
