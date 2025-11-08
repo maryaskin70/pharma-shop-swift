@@ -218,7 +218,8 @@ export const products: Product[] = [
     description: "Anti-inflammatory medication for pain, fever, and inflammation relief. Ibuprofen belongs to a class of drugs called nonsteroidal anti-inflammatory drugs (NSAIDs).",
     shortDescription: "Effective anti-inflammatory pain relief for muscle aches, joint pain, and fever. Trusted by healthcare professionals.",
     dosage: "400mg tablets, take 1 every 4-6 hours with food",
-    activeIngredient: "Ibuprofen 400mg"
+    activeIngredient: "Ibuprofen 400mg",
+    type: "simple"
   },
   {
     id: "4",
@@ -237,7 +238,8 @@ export const products: Product[] = [
     description: "Complete daily multivitamin with essential minerals and nutrients. Supports overall health and wellbeing with a comprehensive blend of vitamins and minerals.",
     shortDescription: "All-in-one daily multivitamin with essential nutrients for optimal health and energy. Perfect for busy lifestyles.",
     dosage: "1 tablet daily with breakfast",
-    activeIngredient: "Multiple vitamins and minerals"
+    activeIngredient: "Multiple vitamins and minerals",
+    type: "simple"
   },
   {
     id: "5",
@@ -256,7 +258,8 @@ export const products: Product[] = [
     description: "Non-drowsy allergy relief for hay fever, pet allergies, and skin reactions. Provides 24-hour relief from allergy symptoms.",
     shortDescription: "Fast-acting, non-drowsy allergy relief for hay fever and allergic reactions. Works within 30 minutes.",
     dosage: "10mg tablets, take 1 daily",
-    activeIngredient: "Cetirizine Hydrochloride 10mg"
+    activeIngredient: "Cetirizine Hydrochloride 10mg",
+    type: "simple"
   },
   {
     id: "6",
@@ -275,7 +278,8 @@ export const products: Product[] = [
     description: "High-quality omega-3 fatty acids for heart and brain health. Sourced from sustainable wild-caught fish with molecular distillation for purity.",
     shortDescription: "Premium omega-3 fish oil for cardiovascular and cognitive health. Pharmaceutical grade purity.",
     dosage: "2 capsules daily with meals",
-    activeIngredient: "Fish Oil 1000mg (EPA 180mg, DHA 120mg)"
+    activeIngredient: "Fish Oil 1000mg (EPA 180mg, DHA 120mg)",
+    type: "simple"
   },
   {
     id: "7",
@@ -296,7 +300,8 @@ export const products: Product[] = [
     dosage: "10ml every 4-6 hours, max 4 doses daily",
     activeIngredient: "Dextromethorphan 15mg/5ml",
     weight: "240g",
-    dimensions: "12 x 5 x 5 cm"
+    dimensions: "12 x 5 x 5 cm",
+    type: "simple"
   },
   {
     id: "8",
@@ -315,7 +320,8 @@ export const products: Product[] = [
     description: "High-potency probiotic for digestive health and immune support. Contains clinically studied strains that survive stomach acid.",
     shortDescription: "High-strength probiotic with 50 billion CFU for optimal gut health and immune support. Shelf-stable.",
     dosage: "1 capsule daily on empty stomach",
-    activeIngredient: "Lactobacillus & Bifidobacterium blend 50 Billion CFU"
+    activeIngredient: "Lactobacillus & Bifidobacterium blend 50 Billion CFU",
+    type: "simple"
   },
   {
     id: "9",
@@ -334,7 +340,8 @@ export const products: Product[] = [
     description: "Low-dose aspirin for cardiovascular health maintenance. Helps prevent blood clots when used as directed by a physician.",
     shortDescription: "Low-dose aspirin for heart health support. Enteric-coated for stomach protection.",
     dosage: "75mg tablets, take 1 daily with food",
-    activeIngredient: "Acetylsalicylic Acid 75mg"
+    activeIngredient: "Acetylsalicylic Acid 75mg",
+    type: "simple"
   },
   {
     id: "10",
@@ -353,7 +360,8 @@ export const products: Product[] = [
     description: "Essential mineral for immune function and wound healing. Zinc plays a vital role in immune cell function and protein synthesis.",
     shortDescription: "Essential zinc supplement for immune function, skin health, and wound healing. Highly absorbable form.",
     dosage: "1 tablet daily with food",
-    activeIngredient: "Zinc Gluconate 25mg"
+    activeIngredient: "Zinc Gluconate 25mg",
+    type: "simple"
   },
   {
     id: "11",
@@ -372,7 +380,8 @@ export const products: Product[] = [
     description: "Fast relief from heartburn, acid indigestion, and upset stomach. Works quickly to neutralize stomach acid.",
     shortDescription: "Quick-acting antacid tablets for heartburn and indigestion relief. Pleasant mint flavor.",
     dosage: "Chew 1-2 tablets as needed, max 8 daily",
-    activeIngredient: "Calcium Carbonate 500mg"
+    activeIngredient: "Calcium Carbonate 500mg",
+    type: "simple"
   },
   {
     id: "12",
@@ -391,7 +400,8 @@ export const products: Product[] = [
     description: "Supports muscle function, energy production, and nervous system health. Magnesium is involved in over 300 biochemical reactions in the body.",
     shortDescription: "High-absorption magnesium for muscle relaxation, energy, and healthy sleep. Gentle on stomach.",
     dosage: "1 tablet daily with evening meal",
-    activeIngredient: "Magnesium Citrate 400mg"
+    activeIngredient: "Magnesium Citrate 400mg",
+    type: "simple"
   },
   {
     id: "13",
@@ -411,7 +421,8 @@ export const products: Product[] = [
     dosage: "1-2 drops in affected eye(s) as needed",
     activeIngredient: "Hypromellose 0.3% w/v",
     weight: "25g",
-    dimensions: "10 x 3 x 3 cm"
+    dimensions: "10 x 3 x 3 cm",
+    type: "simple"
   },
   {
     id: "14",
@@ -430,7 +441,8 @@ export const products: Product[] = [
     description: "Complete B-vitamin complex for energy metabolism and nervous system support. All eight B vitamins in one convenient capsule.",
     shortDescription: "Complete B-complex vitamin formula for energy, metabolism, and mental clarity. Balanced ratios.",
     dosage: "1 capsule daily with breakfast",
-    activeIngredient: "B1, B2, B3, B5, B6, B7, B9, B12"
+    activeIngredient: "B1, B2, B3, B5, B6, B7, B9, B12",
+    type: "simple"
   },
   {
     id: "15",
@@ -449,7 +461,8 @@ export const products: Product[] = [
     description: "Non-habit forming sleep aid for occasional sleeplessness. Helps you fall asleep faster and wake feeling refreshed.",
     shortDescription: "Gentle, non-habit forming sleep aid for occasional insomnia. Wake refreshed without grogginess.",
     dosage: "25mg tablets, take 1 before bedtime",
-    activeIngredient: "Diphenhydramine HCl 25mg"
+    activeIngredient: "Diphenhydramine HCl 25mg",
+    type: "simple"
   },
   {
     id: "16",
@@ -468,7 +481,8 @@ export const products: Product[] = [
     description: "Combined calcium and vitamin D supplement for optimal bone health. Vitamin D enhances calcium absorption for maximum benefit.",
     shortDescription: "Essential calcium with vitamin D for strong bones and teeth. Supports bone density at any age.",
     dosage: "2 tablets daily with meals",
-    activeIngredient: "Calcium Carbonate 600mg + Vitamin D3 400IU"
+    activeIngredient: "Calcium Carbonate 600mg + Vitamin D3 400IU",
+    type: "simple"
   },
   {
     id: "17",
@@ -489,7 +503,8 @@ export const products: Product[] = [
     dosage: "1 spray in each nostril, max 3 times daily",
     activeIngredient: "Xylometazoline 0.1% w/v",
     weight: "35g",
-    dimensions: "11 x 4 x 4 cm"
+    dimensions: "11 x 4 x 4 cm",
+    type: "simple"
   },
   {
     id: "18",
@@ -508,7 +523,8 @@ export const products: Product[] = [
     description: "Iron supplement for prevention and treatment of iron deficiency. Essential for red blood cell production and oxygen transport.",
     shortDescription: "High-potency iron supplement for energy and healthy blood. Gentle formulation.",
     dosage: "1 tablet daily on empty stomach",
-    activeIngredient: "Ferrous Sulfate 65mg elemental iron"
+    activeIngredient: "Ferrous Sulfate 65mg elemental iron",
+    type: "simple"
   },
   {
     id: "19",
@@ -529,7 +545,8 @@ export const products: Product[] = [
     dosage: "Apply thin layer to affected area 3-4 times daily",
     activeIngredient: "Diclofenac Diethylamine 1% w/w",
     weight: "120g",
-    dimensions: "14 x 5 x 4 cm"
+    dimensions: "14 x 5 x 4 cm",
+    type: "simple"
   },
   {
     id: "20",
@@ -548,7 +565,8 @@ export const products: Product[] = [
     description: "High-strength vitamin C for immune support and antioxidant protection. Supports collagen formation and wound healing.",
     shortDescription: "High-potency vitamin C for immune defense and antioxidant support. Time-release formula.",
     dosage: "1 tablet daily with food",
-    activeIngredient: "Ascorbic Acid 1000mg"
+    activeIngredient: "Ascorbic Acid 1000mg",
+    type: "simple"
   },
   {
     id: "21",
@@ -567,7 +585,8 @@ export const products: Product[] = [
     description: "Gentle overnight relief from occasional constipation. Works naturally with your body for comfortable relief.",
     shortDescription: "Gentle overnight constipation relief. Predictable results in 6-12 hours.",
     dosage: "1-2 tablets at bedtime with water",
-    activeIngredient: "Bisacodyl 5mg"
+    activeIngredient: "Bisacodyl 5mg",
+    type: "simple"
   },
   {
     id: "22",
@@ -586,7 +605,8 @@ export const products: Product[] = [
     description: "Medicated lozenges for sore throat relief. Provides numbing action and soothing relief from throat pain.",
     shortDescription: "Soothing throat lozenges for fast sore throat relief. Pleasant honey-lemon flavor.",
     dosage: "Dissolve 1 lozenge slowly every 2-3 hours",
-    activeIngredient: "Benzocaine 6mg + Menthol 10mg"
+    activeIngredient: "Benzocaine 6mg + Menthol 10mg",
+    type: "simple"
   },
   {
     id: "23",
@@ -607,7 +627,8 @@ export const products: Product[] = [
     dosage: "Apply to affected area 2-3 times daily",
     activeIngredient: "Chlorhexidine Gluconate 1% w/w",
     weight: "65g",
-    dimensions: "12 x 4 x 3 cm"
+    dimensions: "12 x 4 x 3 cm",
+    type: "simple"
   },
   {
     id: "24",
@@ -626,7 +647,8 @@ export const products: Product[] = [
     description: "Natural sleep hormone supplement for jet lag and sleep cycle regulation. Helps regulate your body's internal clock.",
     shortDescription: "Natural melatonin for better sleep and jet lag recovery. Non-habit forming.",
     dosage: "3mg tablets, take 1 hour before bedtime",
-    activeIngredient: "Melatonin 3mg"
+    activeIngredient: "Melatonin 3mg",
+    type: "simple"
   },
   {
     id: "25",
@@ -647,7 +669,8 @@ export const products: Product[] = [
     dosage: "Mix 1 scoop (10g) in water or beverage daily",
     activeIngredient: "Hydrolyzed Collagen Peptides 10g",
     weight: "320g",
-    dimensions: "15 x 10 x 10 cm"
+    dimensions: "15 x 10 x 10 cm",
+    type: "simple"
   },
   {
     id: "26",
@@ -668,7 +691,8 @@ export const products: Product[] = [
     dosage: "Apply small amount to affected area 1-3 times daily",
     activeIngredient: "Bacitracin + Neomycin + Polymyxin B",
     weight: "45g",
-    dimensions: "11 x 4 x 3 cm"
+    dimensions: "11 x 4 x 3 cm",
+    type: "simple"
   },
   {
     id: "27",
@@ -687,7 +711,8 @@ export const products: Product[] = [
     description: "Joint support supplement for cartilage health and mobility. Helps maintain healthy cartilage and joint function.",
     shortDescription: "High-strength glucosamine for joint health and flexibility. Supports active lifestyles.",
     dosage: "1 tablet daily with food",
-    activeIngredient: "Glucosamine Sulfate 1500mg"
+    activeIngredient: "Glucosamine Sulfate 1500mg",
+    type: "simple"
   },
   {
     id: "28",
@@ -708,7 +733,8 @@ export const products: Product[] = [
     dosage: "Apply small amount and rub hands together until dry",
     activeIngredient: "Ethanol 70% v/v",
     weight: "270g",
-    dimensions: "18 x 7 x 5 cm"
+    dimensions: "18 x 7 x 5 cm",
+    type: "simple"
   },
   {
     id: "29",
@@ -729,7 +755,8 @@ export const products: Product[] = [
     dosage: "Mix 1 tablespoon in 250ml water daily",
     activeIngredient: "Psyllium Husk 5g per serving",
     weight: "425g",
-    dimensions: "16 x 9 x 9 cm"
+    dimensions: "16 x 9 x 9 cm",
+    type: "simple"
   },
   {
     id: "30",
@@ -748,7 +775,8 @@ export const products: Product[] = [
     description: "Coenzyme Q10 for heart health and cellular energy production. Powerful antioxidant that supports cardiovascular function.",
     shortDescription: "Premium CoQ10 for heart health and cellular energy. Enhanced absorption formula.",
     dosage: "1 capsule daily with a meal containing fat",
-    activeIngredient: "Ubiquinone (CoQ10) 100mg"
+    activeIngredient: "Ubiquinone (CoQ10) 100mg",
+    type: "simple"
   }
 ];
 

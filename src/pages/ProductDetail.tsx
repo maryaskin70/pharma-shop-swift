@@ -7,8 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
-import { Star, ShieldCheck, Truck, Minus, Plus, Share2, Tag, Package } from "lucide-react";
+import { Star, ShieldCheck, Truck, Minus, Plus, Share2, Tag, Package, Heart } from "lucide-react";
 import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
 import {
   Select,
   SelectContent,
@@ -26,6 +27,7 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const { addToCart } = useCart();
+  const { toast } = useToast();
   
   // WooCommerce Variation State
   const [selectedAttributes, setSelectedAttributes] = useState<{ [key: string]: string }>({});
@@ -55,6 +57,16 @@ const ProductDetail = () => {
     }
   }, [product]);
   
+  // Update variation image when variation changes
+  useEffect(() => {
+    if (selectedVariation?.image) {
+      const imageIndex = product?.gallery?.indexOf(selectedVariation.image);
+      if (imageIndex !== undefined && imageIndex >= 0) {
+        setSelectedImage(imageIndex);
+      }
+    }
+  }, [selectedVariation, product]);
+  
   // Update variation when attributes change
   useEffect(() => {
     if (product && product.type === "variable" && product.variations) {
@@ -79,7 +91,17 @@ const ProductDetail = () => {
   }, [selectedAttributes, product]);
 
   const handleAddToCart = () => {
-    if (product && (product.type === "simple" ? product.inStock : selectedVariation?.inStock)) {
+    if (product && (product.type === "simple" || product.type === undefined ? product.inStock : selectedVariation?.inStock)) {
+      // Check if quantity exceeds stock
+      if (quantity > currentStock) {
+        toast({
+          title: "Insufficient Stock",
+          description: `Only ${currentStock} units available in stock.`,
+          variant: "destructive",
+        });
+        return;
+      }
+      
       const variationName = product.type === "variable" && selectedVariation
         ? `${product.name} - ${Object.values(selectedAttributes).join(", ")}`
         : product.name;
@@ -91,6 +113,11 @@ const ProductDetail = () => {
         quantity,
         image: selectedVariation?.image || product.image,
         category: product.category,
+      });
+      
+      toast({
+        title: "Added to Cart",
+        description: `${quantity}x ${variationName} added to your cart.`,
       });
     }
   };
@@ -105,6 +132,27 @@ const ProductDetail = () => {
   const isInStock = product?.type === "variable" 
     ? selectedVariation?.inStock && currentStock > 0
     : product?.inStock;
+    
+  const handleShare = async () => {
+    const shareData = {
+      title: product?.name,
+      text: product?.shortDescription,
+      url: window.location.href,
+    };
+    
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        toast({ title: "Shared successfully!" });
+      } catch (err) {
+        // User cancelled share
+      }
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(window.location.href);
+      toast({ title: "Link copied to clipboard!" });
+    }
+  };
 
   if (!product) {
     return (
@@ -125,6 +173,40 @@ const ProductDetail = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* JSON-LD Schema for SEO */}
+      {product && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org/",
+              "@type": "Product",
+              name: product.name,
+              image: product.image,
+              description: product.description,
+              sku: currentSku,
+              brand: {
+                "@type": "Brand",
+                name: product.brand,
+              },
+              offers: {
+                "@type": "Offer",
+                url: window.location.href,
+                priceCurrency: "USD",
+                price: currentPrice,
+                availability: isInStock
+                  ? "https://schema.org/InStock"
+                  : "https://schema.org/OutOfStock",
+              },
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: product.rating,
+                reviewCount: product.reviews,
+              },
+            }),
+          }}
+        />
+      )}
       <div className="container mx-auto px-4 py-6">
         <Breadcrumbs 
           items={[
@@ -207,9 +289,16 @@ const ProductDetail = () => {
 
             {/* Price and Stock */}
             <div>
-              <p className="text-4xl font-bold text-primary mb-2">
-                ${currentPrice.toFixed(2)}
-              </p>
+              <div className="flex items-baseline gap-3 mb-2">
+                <p className="text-4xl font-bold text-primary">
+                  ${currentPrice.toFixed(2)}
+                </p>
+                {selectedVariation?.regularPrice && selectedVariation.salePrice && (
+                  <p className="text-2xl text-muted-foreground line-through">
+                    ${selectedVariation.regularPrice.toFixed(2)}
+                  </p>
+                )}
+              </div>
               <div className="flex items-center gap-2">
                 {isInStock ? (
                   <>
@@ -268,7 +357,10 @@ const ProductDetail = () => {
                 </div>
               )}
               <div className="flex items-center gap-2">
-                <button className="flex items-center gap-1 text-primary hover:underline">
+                <button 
+                  onClick={handleShare}
+                  className="flex items-center gap-1 text-primary hover:underline"
+                >
                   <Share2 className="h-4 w-4" />
                   <span>Share this product</span>
                 </button>
@@ -294,9 +386,9 @@ const ProductDetail = () => {
                         <SelectTrigger className="w-full h-12">
                           <SelectValue placeholder={`Choose ${attribute.name.toLowerCase()}`} />
                         </SelectTrigger>
-                        <SelectContent className="bg-background border border-border z-50">
+                        <SelectContent className="bg-popover border border-border z-[100]">
                           {attribute.options.map(option => (
-                            <SelectItem key={option} value={option}>
+                            <SelectItem key={option} value={option} className="bg-popover">
                               {option}
                             </SelectItem>
                           ))}
@@ -344,13 +436,16 @@ const ProductDetail = () => {
                 <Button
                   variant="outline"
                   size="icon"
-                  onClick={() => setQuantity(quantity + 1)}
-                  disabled={!isInStock}
+                  onClick={() => setQuantity(Math.min(currentStock, quantity + 1))}
+                  disabled={!isInStock || quantity >= currentStock}
                   className="h-12 w-12"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
               </div>
+              {currentStock > 0 && quantity >= currentStock && (
+                <p className="text-sm text-amber-600">Maximum stock reached</p>
+              )}
             </div>
 
             {/* Action Buttons - Sticky on mobile */}
