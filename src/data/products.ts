@@ -1,3 +1,24 @@
+// WooCommerce Product Variation Structure
+export interface ProductAttribute {
+  id: string;
+  name: string;
+  options: string[];
+  visible: boolean;
+  variation: boolean; // true if used for variations
+}
+
+export interface ProductVariation {
+  id: string;
+  attributes: { [key: string]: string }; // e.g., { "Size": "Large", "Color": "Blue" }
+  price: number;
+  regularPrice?: number; // For sale prices
+  salePrice?: number;
+  stockQuantity: number;
+  inStock: boolean;
+  sku: string;
+  image?: string; // Optional variation-specific image
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -18,6 +39,11 @@ export interface Product {
   activeIngredient: string;
   weight?: string;
   dimensions?: string;
+  // WooCommerce variations support
+  type?: "simple" | "variable"; // Product type
+  attributes?: ProductAttribute[]; // Product attributes
+  variations?: ProductVariation[]; // Product variations
+  defaultAttributes?: { [key: string]: string }; // Default selected attributes
 }
 
 export const products: Product[] = [
@@ -44,7 +70,78 @@ export const products: Product[] = [
     dosage: "500mg tablets, take 1-2 every 4-6 hours as needed",
     activeIngredient: "Paracetamol 500mg",
     weight: "45g",
-    dimensions: "8 x 4 x 2 cm"
+    dimensions: "8 x 4 x 2 cm",
+    type: "variable",
+    attributes: [
+      {
+        id: "pa_size",
+        name: "Pack Size",
+        options: ["30 Tablets", "60 Tablets", "100 Tablets"],
+        visible: true,
+        variation: true
+      },
+      {
+        id: "pa_strength",
+        name: "Strength",
+        options: ["500mg", "1000mg"],
+        visible: true,
+        variation: true
+      }
+    ],
+    variations: [
+      {
+        id: "1-1",
+        attributes: { "Pack Size": "30 Tablets", "Strength": "500mg" },
+        price: 8.99,
+        stockQuantity: 150,
+        inStock: true,
+        sku: "PAR-500-30"
+      },
+      {
+        id: "1-2",
+        attributes: { "Pack Size": "60 Tablets", "Strength": "500mg" },
+        price: 15.99,
+        stockQuantity: 80,
+        inStock: true,
+        sku: "PAR-500-60"
+      },
+      {
+        id: "1-3",
+        attributes: { "Pack Size": "100 Tablets", "Strength": "500mg" },
+        price: 24.99,
+        stockQuantity: 50,
+        inStock: true,
+        sku: "PAR-500-100"
+      },
+      {
+        id: "1-4",
+        attributes: { "Pack Size": "30 Tablets", "Strength": "1000mg" },
+        price: 12.99,
+        stockQuantity: 120,
+        inStock: true,
+        sku: "PAR-1000-30"
+      },
+      {
+        id: "1-5",
+        attributes: { "Pack Size": "60 Tablets", "Strength": "1000mg" },
+        price: 22.99,
+        stockQuantity: 65,
+        inStock: true,
+        sku: "PAR-1000-60"
+      },
+      {
+        id: "1-6",
+        attributes: { "Pack Size": "100 Tablets", "Strength": "1000mg" },
+        price: 35.99,
+        stockQuantity: 30,
+        inStock: true,
+        sku: "PAR-1000-100"
+      }
+    ],
+    defaultAttributes: {
+      "Pack Size": "30 Tablets",
+      "Strength": "500mg"
+    }
   },
   {
     id: "2",
@@ -63,7 +160,46 @@ export const products: Product[] = [
     description: "Essential vitamin D supplement for bone health and immune system support. Vitamin D3 is the natural form of vitamin D that your body makes from sunlight.",
     shortDescription: "Essential vitamin D3 supplement for strong bones and healthy immune function. Easy-to-swallow capsules.",
     dosage: "1 capsule daily with food",
-    activeIngredient: "Cholecalciferol (Vitamin D3) 1000IU"
+    activeIngredient: "Cholecalciferol (Vitamin D3) 1000IU",
+    type: "variable",
+    attributes: [
+      {
+        id: "pa_quantity",
+        name: "Quantity",
+        options: ["60 Capsules", "120 Capsules", "240 Capsules"],
+        visible: true,
+        variation: true
+      }
+    ],
+    variations: [
+      {
+        id: "2-1",
+        attributes: { "Quantity": "60 Capsules" },
+        price: 12.50,
+        stockQuantity: 180,
+        inStock: true,
+        sku: "VD3-1000-60"
+      },
+      {
+        id: "2-2",
+        attributes: { "Quantity": "120 Capsules" },
+        price: 21.99,
+        stockQuantity: 95,
+        inStock: true,
+        sku: "VD3-1000-120"
+      },
+      {
+        id: "2-3",
+        attributes: { "Quantity": "240 Capsules" },
+        price: 39.99,
+        stockQuantity: 45,
+        inStock: true,
+        sku: "VD3-1000-240"
+      }
+    ],
+    defaultAttributes: {
+      "Quantity": "60 Capsules"
+    }
   },
   {
     id: "3",

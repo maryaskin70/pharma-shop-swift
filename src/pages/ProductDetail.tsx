@@ -1,5 +1,5 @@
 import { useParams, Link } from "react-router-dom";
-import { products } from "@/data/products";
+import { products, ProductVariation } from "@/data/products";
 import { useCart } from "@/contexts/CartContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -8,7 +8,14 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { Star, ShieldCheck, Truck, Minus, Plus, Share2, Tag, Package } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 // WordPress/WooCommerce Product Detail page pattern
 // Product data will be fetched from: /wp-json/wc/v3/products/{id}
@@ -19,19 +26,85 @@ const ProductDetail = () => {
   const [quantity, setQuantity] = useState(1);
   const [selectedImage, setSelectedImage] = useState(0);
   const { addToCart } = useCart();
+  
+  // WooCommerce Variation State
+  const [selectedAttributes, setSelectedAttributes] = useState<{ [key: string]: string }>({});
+  const [selectedVariation, setSelectedVariation] = useState<ProductVariation | null>(null);
+  const [currentPrice, setCurrentPrice] = useState(0);
+  const [currentStock, setCurrentStock] = useState(0);
+  const [currentSku, setCurrentSku] = useState("");
+  
+  // Initialize default attributes and variation
+  useEffect(() => {
+    if (product) {
+      if (product.type === "variable" && product.attributes && product.variations) {
+        // Set default attributes
+        const defaults = product.defaultAttributes || {};
+        product.attributes.forEach(attr => {
+          if (attr.variation && !defaults[attr.name] && attr.options.length > 0) {
+            defaults[attr.name] = attr.options[0];
+          }
+        });
+        setSelectedAttributes(defaults);
+      } else {
+        // Simple product
+        setCurrentPrice(product.price);
+        setCurrentStock(product.stockQuantity || 0);
+        setCurrentSku(product.sku);
+      }
+    }
+  }, [product]);
+  
+  // Update variation when attributes change
+  useEffect(() => {
+    if (product && product.type === "variable" && product.variations) {
+      const variation = product.variations.find(v => {
+        return Object.entries(selectedAttributes).every(([key, value]) => {
+          return v.attributes[key] === value;
+        });
+      });
+      
+      if (variation) {
+        setSelectedVariation(variation);
+        setCurrentPrice(variation.salePrice || variation.price);
+        setCurrentStock(variation.stockQuantity);
+        setCurrentSku(variation.sku);
+      } else {
+        setSelectedVariation(null);
+        setCurrentPrice(product.price);
+        setCurrentStock(0);
+        setCurrentSku(product.sku);
+      }
+    }
+  }, [selectedAttributes, product]);
 
   const handleAddToCart = () => {
-    if (product && product.inStock) {
+    if (product && (product.type === "simple" ? product.inStock : selectedVariation?.inStock)) {
+      const variationName = product.type === "variable" && selectedVariation
+        ? `${product.name} - ${Object.values(selectedAttributes).join(", ")}`
+        : product.name;
+      
       addToCart({
-        id: product.id,
-        name: product.name,
-        price: product.price,
+        id: selectedVariation ? selectedVariation.id : product.id,
+        name: variationName,
+        price: currentPrice,
         quantity,
-        image: product.image,
+        image: selectedVariation?.image || product.image,
         category: product.category,
       });
     }
   };
+  
+  const handleAttributeChange = (attributeName: string, value: string) => {
+    setSelectedAttributes(prev => ({
+      ...prev,
+      [attributeName]: value
+    }));
+  };
+  
+  const isInStock = product?.type === "variable" 
+    ? selectedVariation?.inStock && currentStock > 0
+    : product?.inStock;
 
   if (!product) {
     return (
@@ -135,17 +208,17 @@ const ProductDetail = () => {
             {/* Price and Stock */}
             <div>
               <p className="text-4xl font-bold text-primary mb-2">
-                ${product.price.toFixed(2)}
+                ${currentPrice.toFixed(2)}
               </p>
               <div className="flex items-center gap-2">
-                {product.inStock ? (
+                {isInStock ? (
                   <>
                     <Badge variant="secondary" className="bg-accent text-accent-foreground">
                       In Stock
                     </Badge>
-                    {product.stockQuantity && (
+                    {currentStock > 0 && (
                       <span className="text-sm text-muted-foreground">
-                        {product.stockQuantity} units available
+                        {currentStock} units available
                       </span>
                     )}
                   </>
@@ -169,7 +242,7 @@ const ProductDetail = () => {
               <div className="flex items-center gap-2">
                 <Package className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">SKU:</span>
-                <span className="text-muted-foreground">{product.sku}</span>
+                <span className="text-muted-foreground">{currentSku}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Tag className="h-4 w-4 text-muted-foreground" />
@@ -204,6 +277,54 @@ const ProductDetail = () => {
 
             <Separator />
 
+            {/* WooCommerce Product Attributes / Variations */}
+            {product.type === "variable" && product.attributes && (
+              <div className="space-y-4">
+                {product.attributes
+                  .filter(attr => attr.variation && attr.visible)
+                  .map(attribute => (
+                    <div key={attribute.id} className="space-y-2">
+                      <label className="text-sm font-medium">
+                        {attribute.name}
+                      </label>
+                      <Select
+                        value={selectedAttributes[attribute.name] || ""}
+                        onValueChange={(value) => handleAttributeChange(attribute.name, value)}
+                      >
+                        <SelectTrigger className="w-full h-12">
+                          <SelectValue placeholder={`Choose ${attribute.name.toLowerCase()}`} />
+                        </SelectTrigger>
+                        <SelectContent className="bg-background border border-border z-50">
+                          {attribute.options.map(option => (
+                            <SelectItem key={option} value={option}>
+                              {option}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  ))}
+                
+                {/* Variation Details */}
+                {selectedVariation && (
+                  <div className="p-3 bg-muted/50 rounded-md text-sm space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Selected:</span>
+                      <span className="font-medium">{Object.values(selectedAttributes).join(" / ")}</span>
+                    </div>
+                    {selectedVariation.regularPrice && selectedVariation.salePrice && (
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">You save:</span>
+                        <span className="font-medium text-accent">
+                          ${(selectedVariation.regularPrice - selectedVariation.salePrice).toFixed(2)}
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )}
+
             <Separator />
 
             {/* Quantity Selector */}
@@ -214,7 +335,8 @@ const ProductDetail = () => {
                   variant="outline"
                   size="icon"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  disabled={!product.inStock}
+                  disabled={!isInStock}
+                  className="h-12 w-12"
                 >
                   <Minus className="h-4 w-4" />
                 </Button>
@@ -223,7 +345,8 @@ const ProductDetail = () => {
                   variant="outline"
                   size="icon"
                   onClick={() => setQuantity(quantity + 1)}
-                  disabled={!product.inStock}
+                  disabled={!isInStock}
+                  className="h-12 w-12"
                 >
                   <Plus className="h-4 w-4" />
                 </Button>
@@ -235,7 +358,7 @@ const ProductDetail = () => {
               <Button 
                 className="w-full min-h-[48px]" 
                 size="lg" 
-                disabled={!product.inStock}
+                disabled={!isInStock}
                 onClick={handleAddToCart}
               >
                 Add to Cart
@@ -245,7 +368,7 @@ const ProductDetail = () => {
                   variant="secondary" 
                   className="w-full min-h-[48px]" 
                   size="lg" 
-                  disabled={!product.inStock}
+                  disabled={!isInStock}
                   onClick={handleAddToCart}
                 >
                   Buy Now
